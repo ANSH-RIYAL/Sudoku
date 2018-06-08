@@ -6,7 +6,8 @@ class SudokuBoard():
 	def __init__(self, size = 9):
 		self.grid = [[0 for x in range(size)] for y in range(size)]
 		self.size = size
-		self.root_size = int(sqrt(size))
+		self.RootSize = int(sqrt(size))
+		self.HiddenSquares = []
 
 	def availableEntries(self, row, col):
 
@@ -30,11 +31,11 @@ class SudokuBoard():
 		ensure there is not repetition in that box.
 		'''
 
-		StartingRow = row - row%self.root_size
-		StartingColumn = col - col%self.root_size
+		StartingRow = row - row%self.RootSize
+		StartingColumn = col - col%self.RootSize
 
-		for i in range(self.root_size):
-			for j in range(self.root_size):
+		for i in range(self.RootSize):
+			for j in range(self.RootSize):
 				if self.grid[StartingRow + i][StartingColumn + j] == val:
 					return False
 
@@ -165,5 +166,76 @@ class SudokuBoard():
 		for i in range(self.size):
 			for j in range(self.size):
 				print self.grid[i][j],
-			print 
+			print
+
+	def HideNumbers(self, k):
+
+		'''
+		Hides K numbers randomly in the grid and updates
+		the squares that are hidden.
+		'''
+
+		AlreadyHidden = []
+
+		i = 0
+
+		while i < k:
+			row = random.randint(1, self.size)
+			col = random.randint(1, self.size)
+			if (row, col) not in AlreadyHidden:
+				AlreadyHidden.append((row, col))
+				i += 1
+				self.grid[row][col] = 0
+
+		self.HiddenSquares = []
+
+		for i in range(self.size):
+			for j in range(self.size):
+				if self.grid[i][j] == 0:
+					self.HiddenSquares.append((i, j))
+
+	def Mistakes(self):
+
+		'''
+		Return a list of numbers where there are possible repetitions
+		and straight forward mistakes.
+		Eg: Placing a number twice in the same row,
+		'''
+
+		mistakes = set()
+
+		for i in range(self.size):
+			for j in range(self.size):
+				if self.grid[i][j] == 0:
+					continue
+				for k in range(self.size):
+					# Same row check
+					if k != j and grid[i][k] == grid[i][j]:
+						if (i, j) in self.HiddenSquares:
+							mistakes.add((i, j))
+						if (i, k) in self.HiddenSquares:
+							mistakes.add((i, k))
+					# Same column check
+					if k != i and grid[k][j] == grid[i][j]:
+						if (i, j) in self.HiddenSquares:
+							mistakes.add((i, j))
+						if (k, j) in self.HiddenSquares:
+							mistakes.add((k, j))
+
+				#Same box check
+
+				row = i - i%self.RootSize
+				column = j - j%self.RootSize
+
+				for x in range(self.RootSize):
+					for y in range(self.RootSize):
+						if (x == i and y == j) or grid[x][y] == 0:
+							continue
+						if self.grid[x][y] == self.grid[i][j]:
+							if (x, y) in self.HiddenSquares:
+								mistakes.add((x, y))
+							if (i, j) in self.HiddenSquares:
+								mistakes.add((i, j))
+
+		return list(mistakes)
 
