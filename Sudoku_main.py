@@ -180,8 +180,8 @@ class SudokuBoard():
 		i = 0
 
 		while i < k:
-			row = random.randint(1, self.size)
-			col = random.randint(1, self.size)
+			row = random.randint(0, self.size-1)
+			col = random.randint(0, self.size-1)
 			if (row, col) not in AlreadyHidden:
 				AlreadyHidden.append((row, col))
 				i += 1
@@ -239,3 +239,7 @@ class SudokuBoard():
 
 		return list(mistakes)
 
+sudoku = SudokuBoard()
+sudoku.Solve()
+sudoku.HideNumbers(10)
+sudoku.PrintSudokuBoard()
